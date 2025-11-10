@@ -1,6 +1,4 @@
-from typing import Dict, List, Tuple, Optional
-import heapq
-import math
+from typing import Dict, List, Tuple
 from copy import deepcopy
 
 
@@ -107,3 +105,17 @@ class State:
                 self.memory=0.0
         
             return True, transmit_cost
+        
+    def can_consume(self, cost: float) -> bool:
+        return cost <= (self.battery )
+
+    def consume(self, cost: float):
+        self.battery -= cost
+
+    def move(self, next_id: int, cost: float) -> bool:
+        if not self.can_consume(cost):
+            return False
+        self.consume(cost)
+        self.pos = next_id
+        self.route.append(next_id)
+        return True

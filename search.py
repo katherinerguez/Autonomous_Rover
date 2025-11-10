@@ -1,6 +1,7 @@
 import heapq
 import math
-from environment import 
+from typing import Dict, List, Tuple, Optional
+from environment import Environment, Edge, terrain_consumption, rc_id, id_rc
 
 def cost(edge: Edge, consumption_map=terrain_consumption):
     consumption_terrain = consumption_map.get(edge.terrain, consumption_map['plano'])
