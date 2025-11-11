@@ -13,8 +13,14 @@ def heuristic(env: Environment, a: int, b: int) -> float:
     return math.hypot(na.x - nb.x, na.y - nb.y)
 
 def dijkstra(env: Environment, start_rc: Tuple[int,int], goal_rc: Tuple[int,int],  use_heuristic: bool = False):
-    start = rc_id(start_rc[0], start_rc[1], env.w)
-    goal = rc_id(goal_rc[0], goal_rc[1], env.w)
+    if type(start_rc) is int:
+        start=start_rc
+    else:
+        start = rc_id(start_rc[0], start_rc[1], env.w)
+    if type(goal_rc) is int:
+        goal=goal_rc
+    else:
+        goal = rc_id(goal_rc[0], goal_rc[1], env.w)
     if start not in env.nodes or goal not in env.nodes:
         return None, float('inf')
 
