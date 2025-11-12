@@ -57,7 +57,7 @@ class Environment:
 
         for nid, node in list(self.nodes.items()):
             for dr, dc in moves:
-                nr, nc = node.row + dr, node.col + dc
+                nr, nc = node.x + dr, node.y + dc
                 
                 if not (0 <= nr < self.h and 0 <= nc < self.w):
                     continue
@@ -95,12 +95,12 @@ class State:
             return True
         return False
 
-    def transmitir(self, env: Environment,  poi: List[int], transmit_cost: float = 3.0) -> Tuple[bool, float]:
+    def transmitir(self, env: Environment,  poi: List[int], transmit_cost: float = 3.0, safety_margin=0.0) -> Tuple[bool, float]:
         node = env.nodes.get(self.pos)
         if node is None:
             return False, 0.0
         if type(node) is int: 
-            node_rc=id_rc(node, 5)
+            node_rc=id_rc(node, env.w)
             if node_rc in poi:
                 self.memory=0.0
         
@@ -112,7 +112,7 @@ class State:
     def consume(self, cost: float):
         self.battery -= cost
 
-    def move(self, next_id: int, cost: float) -> bool:
+    def move(self, next_id: int, cost: float, ) -> bool:
         if not self.can_consume(cost):
             return False
         self.consume(cost)

@@ -1,6 +1,6 @@
 import heapq
 import math
-from typing import Dict, List, Tuple, Optional
+from typing import Tuple
 from environment import Environment, Edge, terrain_consumption, rc_id, id_rc
 
 def cost(edge: Edge, consumption_map=terrain_consumption):
@@ -12,15 +12,18 @@ def heuristic(env: Environment, a: int, b: int) -> float:
     na, nb = env.nodes[a], env.nodes[b]
     return math.hypot(na.x - nb.x, na.y - nb.y)
 
-def dijkstra(env: Environment, start_rc: Tuple[int,int], goal_rc: Tuple[int,int],  use_heuristic: bool = False):
+def dijkstra(env: Environment, start_rc: Tuple[int,int], goal_rc: Tuple[int,int], use_heuristic: bool = False):
     if type(start_rc) is int:
         start=start_rc
     else:
         start = rc_id(start_rc[0], start_rc[1], env.w)
     if type(goal_rc) is int:
         goal=goal_rc
+        print('es entero')
+        pto=id_rc(goal, env.w)
     else:
         goal = rc_id(goal_rc[0], goal_rc[1], env.w)
+        pto=goal_rc
     if start not in env.nodes or goal not in env.nodes:
         return None, float('inf')
 
@@ -68,4 +71,6 @@ def dijkstra(env: Environment, start_rc: Tuple[int,int], goal_rc: Tuple[int,int]
     path_ids.append(start)
     path_ids.reverse()
     path_rc = [id_rc(nid, env.w) for nid in path_ids]
-    return path_rc, dist[goal]
+    distances={pto:path_rc}
+    return distances, dist[goal]
+

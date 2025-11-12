@@ -6,6 +6,7 @@ def simulate(state: 'State', tour: List[int],
              path_matrix: Dict[int, Dict[int, Optional[List[Tuple[int,int]]]]],
              env: Environment,
              transmit_cost: Optional[float] = None,
+             safety_margin: float = 0.0
              ) -> Tuple[bool, State, List[Dict], float, float]:
     s = state.clone()
     profile: List[Dict] = []
@@ -15,13 +16,13 @@ def simulate(state: 'State', tour: List[int],
         d = dist_matrix.get(s.pos, {}).get(p)
         if d is None:
             return False, s, profile, s.battery, float('inf')
-        if not s.move(p, d):
+        if not s.move(p, d, safety_margin):
             return False, s, profile, s.battery, float('inf')
         total_cost += d
         profile.append({'from': None, 'to': p, 'cost': d, 'path': path_matrix.get(s.pos, {}).get(p)})
 
         if transmit_cost is not None:
-            ok_tx, tx_cost = s.transmitir(env, poi, transmit_cost)
+            ok_tx, tx_cost = s.transmitir(env, poi, transmit_cost, safety_margin=safety_margin)
             if not ok_tx:
                 return False, s, profile, s.battery, float('inf')
             total_cost += tx_cost

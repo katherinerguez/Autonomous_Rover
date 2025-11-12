@@ -1,7 +1,8 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from copy import deepcopy
 import random
-from environment import Environment
+from environment import Environment, State
+from simulate import simulate
 
 class Individual:
     def __init__(self, bitmask: List[int], perm: List[int]):
