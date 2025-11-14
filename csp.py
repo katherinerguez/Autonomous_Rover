@@ -22,7 +22,7 @@ def estimate_min_tour_cost(base_id: int, selected: List[int], dist_matrix: Dict[
     return cost
 
 def csp_select_pois_by_battery_memory(env: 'Environment', candidates: List[int], dist_matrix: Dict[int, Dict[int, Optional[float]]],
-                                      max_battery: float, max_memory: float,) -> List[int]:
+                                      max_battery: float, max_memory: float) -> List[int]:
     order = sorted(candidates, key=lambda p: dist_matrix.get(env.base_id, {}).get(p, float('inf')))
     
     best_solution: List[int] = []
