@@ -1,10 +1,10 @@
 from typing import Dict, List, Optional
-from environment import Environment
+from environment import Environment, id_rc
 
-def estimate_min_tour_cost(base_id: int, selected: List[int], dist_matrix: Dict[int, Dict[int, Optional[float]]], action_cost: float) -> float:
+def estimate_min_tour_cost(env: 'Environment', selected: List[int], dist_matrix: Dict[int, Dict[int, Optional[float]]]) -> float:
     if not selected:
         return 0.0
-    cur = base_id
+    cur = id_rc(env.base_id, env.w)
     cost = 0.0
     unvis = set(selected)
     while unvis:
@@ -15,10 +15,10 @@ def estimate_min_tour_cost(base_id: int, selected: List[int], dist_matrix: Dict[
         cost += d
         cur = nxt
         unvis.remove(nxt)
-    back = dist_matrix.get(cur, {}).get(base_id)
+    back = dist_matrix.get(cur, {}).get(cur)
     if back is None:
         return float('inf')
-    cost += back + len(selected) * action_cost
+    cost += back 
     return cost
 
 def csp_select_pois_by_battery_memory(env: 'Environment', candidates: List[int], dist_matrix: Dict[int, Dict[int, Optional[float]]],
@@ -27,27 +27,31 @@ def csp_select_pois_by_battery_memory(env: 'Environment', candidates: List[int],
     
     best_solution: List[int] = []
     best_count = 0
-
+    base=id_rc(env.base_id, env.w)
     def backtrack(i: int, selected: List[int]):
         nonlocal best_solution, best_count
         
-        est = estimate_min_tour_cost(env.base_id, selected, dist_matrix)
-        if est <= max_battery and len(selected) > best_count:
+        est = estimate_min_tour_cost(env, selected, dist_matrix)
+        
+        if selected and est <= max_battery and len(selected) > best_count:
             best_solution = selected.copy()
             best_count = len(selected)
         if i >= len(order):
             return
         
         p = order[i]
-        # quick reachability check
-        if dist_matrix.get(env.base_id, {}).get(p) is not None:
-            selected.append(p)
-            # forward check: if still possible to be feasible
-            est2 = estimate_min_tour_cost(env.base_id, selected, dist_matrix)
-            if est2 <= max_battery:
-                backtrack(i+1, selected)
-            selected.pop()
-        backtrack(i+1, selected)
-
+        
+        selected.append(p)
+        est2 = estimate_min_tour_cost(env, selected, dist_matrix)
+        if est2 <= max_battery:
+            backtrack(i + 1, selected)
+        selected.pop()
+        backtrack(i + 1, selected)
     backtrack(0, [])
+    if not best_solution:
+        for p in order:
+            est1 = estimate_min_tour_cost(env, [p], dist_matrix)
+            if est1 <= max_battery and 1 <= max_memory:
+                return [p]
+    
     return best_solution
